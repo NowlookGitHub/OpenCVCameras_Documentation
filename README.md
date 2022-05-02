@@ -27,6 +27,8 @@
 
 This event will be called each time a new frame is available, so use it to update a material with the Texture2D or whatever you want. You can found an example map in the content plugin folder, feel free to test it!
 
+And do not forget to add required Android permissions for the cameras.
+![](./Screenshots/GrantPermissions.jpg)
 
 ### **OpenCV**
 
