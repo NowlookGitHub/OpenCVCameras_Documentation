@@ -30,8 +30,62 @@ This event will be called each time a new frame is available, so use it to updat
 And do not forget to add required Android permissions for the cameras.
 ![](./Screenshots/GrantPermissions.jpg)
 
-### **OpenCV**
+### **OpenCV (C++ only)**
 
-You can use OpenCV if you need to do some image processing. The library is already integrated in the plugin. Check out the Driver.h file (located in the [plugin folder]/Source/OpenCVCameras/Public/OpenCV/ folder) to know how to import OpenCV in your own file.
+If you want to use OpenCV in your C++ code, first, you need to add the plugin dependencies in your [Project_Name].build.cs:
+```c#
+using System;						
+using System.IO;					
+using System.Collections.Generic; 	
+using UnrealBuildTool;
 
-Don't forget to add the module dependency in your Build.cs file.
+public class MobileSensorManager : ModuleRules
+{
+	public MobileSensorManager(ReadOnlyTargetRules Target) : base(Target)
+	{
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+	
+		PrivateDependencyModuleNames.AddRange(new string[] {});
+		PublicDependencyModuleNames.AddRange(new string[] { 
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore",
+            "OpenCVCameras" // <- Here.
+        });
+    }
+}
+```
+
+Then you need to import the libraries in your C++ files, like this:
+
+```c++
+// Prevent some conflict warnings between UE and OpenCV.
+#pragma push_macro("check")
+#undef check
+#define int64 OpenCV_int64
+#define uint64 OpenCV_uint64
+#pragma warning(push)
+#pragma warning(disable : 4946)
+
+// Import the modules that you need here.
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+
+// Revert changes made above.
+#pragma warning(pop)
+#undef int64
+#undef uint64
+#pragma pop_macro("check")
+```
+
+Then you can use OpenCV normally, like:
+
+```c++
+// Example code.
+cv::Mat Frame;
+cv::Vec3b Pixel = Frame.at<cv::Vec3b>(Y, X);
+```
+
+
+Check out the Driver.h file (located in the [plugin folder]/Source/OpenCVCameras/Public/OpenCV/ folder) to know how this plugin use OpenCV.
