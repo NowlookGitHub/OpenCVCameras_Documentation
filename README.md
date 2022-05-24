@@ -83,8 +83,37 @@ Then you can use OpenCV normally, like:
 
 ```c++
 // Example code.
-cv::Mat Frame;
-cv::Vec3b Pixel = Frame.at<cv::Vec3b>(Y, X);
+#if PLATFORM_ANDROID //Android only for now.
+
+// Prevent some conflict warnings between UE and OpenCV.
+#pragma push_macro("check")
+#undef check
+#define int64 OpenCV_int64
+#define uint64 OpenCV_uint64
+#pragma warning(push)
+#pragma warning(disable : 4946)
+
+// Import the modules that you need here.
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+
+// Revert changes made above.
+#pragma warning(pop)
+#undef int64
+#undef uint64
+#pragma pop_macro("check")
+
+using namespace cv;
+using namespace std;
+
+// Read the image file
+Mat image = imread("D:/My OpenCV Website/Lotus.jpeg");
+
+//Blur the image with 3x3 Gaussian kernel
+Mat image_blurred_with_3x3_kernel;
+GaussianBlur(image, image_blurred_with_3x3_kernel, Size(3, 3), 0);
+
+#endif
 ```
 
 
